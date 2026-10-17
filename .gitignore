@@ -1,0 +1,10 @@
+data/
+salida/
+*.db
+*.pdf
+build/
+dist/
+__pycache__/
+.venv/
+.pytest_cache/
+.env
