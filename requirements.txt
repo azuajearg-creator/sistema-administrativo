@@ -2,5 +2,5 @@ customtkinter>=5.2
 pandas>=2.0
 openpyxl>=3.1
 reportlab>=4.0
-weasyprint>=60
 pytest>=8.0
+pypdf>=4.0

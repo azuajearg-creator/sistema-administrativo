@@ -5,88 +5,9 @@ from base_datos import (registrar_venta, guardar_factura,
                         obtener_datos_clientes, obtener_productos, 
                         obtener_info_producto_por_nombre,
                         obtener_nota_por_numero, marcar_nota_como_facturada)
-from weasyprint import HTML
+from documentos import generar_pdf_factura
 import datetime
 import os
-
-# --- 1. FUNCIÓN PARA GENERAR EL PDF CON MARGEN SUPERIOR AJUSTADO ---
-def generar_pdf_factura(datos_cliente, items, porc_desc, monto_desc, subtotal, iva, total, nro_factura_manual):
-    fecha_hoy = datetime.datetime.now().strftime("%d/%m/%Y")
-    
-    estilos = """
-    <style>
-        @page { 
-            size: letter; 
-            margin-top: 40mm; /* Aumentado para dejar espacio al encabezado pre-impreso */
-            margin-bottom: 15mm;
-            margin-left: 15mm;
-            margin-right: 15mm;
-        }
-        body { font-family: 'Arial', sans-serif; color: #333; line-height: 1.4; }
-        .header-factura { text-align: right; margin-bottom: 20px; font-size: 12px; }
-        .nro-factura { color: #e74c3c; font-size: 18px; font-weight: bold; border: 1px solid #e74c3c; padding: 5px; display: inline-block; }
-        .info-comprador { margin-bottom: 25px; border: 1px solid #ddd; padding: 15px; background-color: #f9f9f9; font-size: 11px;}
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th { border-bottom: 2px solid #2980b9; padding: 8px; text-align: left; background-color: #2980b9; color: white; font-size: 11px;}
-        td { padding: 8px; border-bottom: 1px solid #eee; font-size: 10px;}
-        .col-item { width: 40px; text-align: center; }
-        .totales-box { margin-top: 30px; float: right; width: 45%; }
-        .totales-box td { border: none; text-align: right; padding: 4px; font-size: 11px;}
-        .total-final { font-size: 14px; font-weight: bold; border-top: 2px solid #2980b9 !important; color: #2ecc71;}
-    </style>
-    """
-
-    filas_tabla = ""
-    for i, it in enumerate(items, 1):
-        filas_tabla += f"""
-        <tr>
-            <td class="col-item">{i}</td>
-            <td style="text-align: left;">{it['nombre']}</td>
-            <td>{it['cantidad']}</td>
-            <td>${it['precio']:.2f}</td>
-            <td>${it['subtotal']:.2f}</td>
-        </tr>"""
-
-    html_content = f"""
-    <html>
-    <head>{estilos}</head>
-    <body>
-        <div class="header-factura">
-            <div class="nro-factura">FACTURA NRO: {nro_factura_manual}</div><br>
-            <strong>FECHA DE EMISIÓN: {fecha_hoy}</strong>
-        </div>
-
-        <div class="info-comprador">
-            <strong style="font-size: 12px;">DATOS DEL CLIENTE</strong><br>
-            <strong>RAZÓN SOCIAL:</strong> {datos_cliente['nombre']}<br>
-            <strong>RIF:</strong> {datos_cliente['rif']}<br>
-            <strong>DIRECCIÓN FISCAL:</strong> {datos_cliente['direccion']}<br>
-            <strong>TELÉFONO:</strong> {datos_cliente['telefono']}
-        </div>
-
-        <table>
-            <thead>
-                <tr>
-                    <th class="col-item">ITEM</th><th>DESCRIPCIÓN</th><th>CANT.</th><th>P. UNIT</th><th>TOTAL</th>
-                </tr>
-            </thead>
-            <tbody>{filas_tabla}</tbody>
-        </table>
-
-        <table class="totales-box">
-            <tr><td>SUBTOTAL BRUTO:</td><td>${subtotal:.2f}</td></tr>
-            <tr><td>DESCUENTO ({porc_desc}%):</td><td>-${monto_desc:.2f}</td></tr>
-            <tr><td>BASE IMPONIBLE:</td><td>${(subtotal - monto_desc):.2f}</td></tr>
-            <tr><td>I.V.A. (16%):</td><td>${iva:.2f}</td></tr>
-            <tr class="total-final"><td>TOTAL A PAGAR:</td><td>${total:.2f}</td></tr>
-        </table>
-    </body>
-    </html>
-    """
-    
-    nombre_archivo = ruta_salida(f"Factura_{nro_factura_manual}.pdf")
-    HTML(string=html_content).write_pdf(nombre_archivo)
-    return nombre_archivo
 
 class VentanaFacturacion(ctk.CTkToplevel):
     def __init__(self, master):

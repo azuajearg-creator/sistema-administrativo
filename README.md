@@ -21,7 +21,7 @@ Desarrollada por **Arnulfo José Azuaje Roa** a partir de un sistema real usado 
 
 ## Tecnologías
 
-Python 3 · CustomTkinter (interfaz) · SQLite · pandas / openpyxl (carga masiva) · ReportLab y WeasyPrint (PDF) · pytest
+Python 3 · CustomTkinter (interfaz) · SQLite · pandas / openpyxl (carga masiva) · ReportLab (PDF) · pytest
 
 ## Puesta en marcha
 
@@ -34,8 +34,6 @@ pip install -r requirements.txt
 python seed_demo.py --reset   # crea la base con datos FICTICIOS de ejemplo
 python main.py                # abre la aplicación
 ```
-
-WeasyPrint necesita bibliotecas del sistema; en Windows consulte su [guía de instalación](https://doc.courtbouillon.org/weasyprint/stable/first_steps.html).
 
 ### Configuración
 
@@ -64,7 +62,7 @@ python main.py
 pytest
 ```
 
-17 pruebas sobre la capa de datos: altas y bajas de productos, ventas con control de stock, validación de RIF y teléfono, facturas de compra con actualización de inventario, abonos y saldos, y reversión de transacciones con error.
+21 pruebas: la capa de datos (altas y bajas de productos, ventas con control de stock, validación de RIF y teléfono, facturas de compra con actualización de inventario, abonos y saldos, reversión de transacciones con error) y la generación de PDF (contenido, caracteres especiales y documentos de varias páginas).
 
 ## Estructura
 
@@ -72,6 +70,7 @@ pytest
 main.py              Menú principal
 config.py            Datos de la empresa, rutas y utilidades
 base_datos.py        Esquema SQLite y todas las operaciones de datos
+documentos.py        Nota de entrega y factura en PDF (ReportLab)
 app_*.py             Una ventana por módulo (inventario, clientes, presupuestos, ...)
 seed_demo.py         Datos ficticios de ejemplo
 tests/               Pruebas con pytest
@@ -83,7 +82,6 @@ tests/               Pruebas con pytest
 - El IVA está fijo en 16 % en la facturación.
 - La interfaz gráfica no tiene pruebas automáticas; las pruebas cubren la capa de datos.
 - Es una aplicación de un solo usuario sobre SQLite, sin autenticación.
-- Los PDF de nota de entrega y factura necesitan WeasyPrint, que requiere instalar dependencias del sistema.
 
 ## Licencia
 

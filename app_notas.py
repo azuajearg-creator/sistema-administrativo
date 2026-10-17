@@ -4,92 +4,9 @@ from tkinter import messagebox, ttk
 from base_datos import (obtener_datos_clientes, obtener_productos, 
                         obtener_info_producto_por_nombre, registrar_venta,
                         guardar_nota_entrega, obtener_todas_las_notas) # Se agregó la nueva función
-from weasyprint import HTML
+from documentos import generar_pdf_nota
 import datetime
 import os
-
-# --- 1. FUNCIÓN PARA GENERAR EL PDF CON DISEÑO CORREGIDO ---
-def generar_pdf_nota(cliente_datos, direccion_cliente, items, observaciones, nro_nota):
-    # Formato de fecha solo día/mes/año
-    fecha_hoy = datetime.datetime.now().strftime("%d/%m/%Y")
-    
-    estilos = """
-    <style>
-        @page { size: letter; margin: 15mm; }
-        html, body { height: 100%; margin: 0; padding: 0; }
-        body { font-family: 'Arial', sans-serif; color: #333; line-height: 1.4; position: relative; }
-        
-        .header-container { border-bottom: 2px solid #2980b9; padding-bottom: 10px; text-align: center; }
-        .header-text { width: 100%; }
-        .header-text h1 { margin: 0; color: #2980b9; font-size: 22px; }
-        .header-text p { margin: 1px 0; font-size: 10px; }
-        
-        .info-seccion { margin: 15px 0; }
-        .info-table { width: 100%; border: none; }
-        .info-table td { border: none; padding: 2px; text-align: left; vertical-align: top; font-size: 11px; }
-        
-        .tabla-productos { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        .tabla-productos th { background-color: #2980b9; color: white; padding: 8px; font-size: 11px; border: 1px solid #2980b9; }
-        .tabla-productos td { border: 1px solid #ddd; padding: 6px; text-align: center; font-size: 10px; }
-        
-        .obs-container { margin-top: 15px; }
-        .obs-cuadro { border: 1px solid #eee; padding: 8px; margin-top: 5px; min-height: 40px; font-size: 10px; color: #444; background-color: #f9f9f9; }
-        
-        .firma-box { position: absolute; bottom: 10px; width: 100%; border: none; }
-        .linea-firma { border-top: 1px solid #333; padding-top: 8px; font-size: 10px; text-align: center; }
-    </style>
-    """
-
-    filas_tabla = ""
-    for i, it in enumerate(items, 1):
-        filas_tabla += f"<tr><td>{i}</td><td style='text-align: left;'>{it['nombre']}</td><td>{it['cantidad']}</td></tr>"
-
-    html_content = f"""
-    <html>
-    <head>{estilos}</head>
-    <body>
-        <div class="header-container">
-            <div class="header-text">
-                <h1>{EMPRESA_NOMBRE.upper()}</h1>
-                <p><strong>RIF:</strong> {EMPRESA_RIF}</p>
-                <p>{EMPRESA_CIUDAD}</p>
-            </div>
-        </div>
-        <div class="info-seccion">
-            <table class="info-table">
-                <tr>
-                    <td style="width: 65%;">
-                        <strong>CLIENTE:</strong> {cliente_datos}<br>
-                        <strong>DIRECCIÓN:</strong> {direccion_cliente}
-                    </td>
-                    <td style="width: 35%; text-align: right;">
-                        <strong>NOTA DE ENTREGA:</strong> <span style="color: #c0392b;"># {nro_nota}</span><br>
-                        <strong>FECHA:</strong> {fecha_hoy}
-                    </td>
-                </tr>
-            </table>
-        </div>
-        <table class="tabla-productos">
-            <thead><tr><th style="width: 10%;">ITEM</th><th style="width: 70%;">DESCRIPCIÓN DEL INSUMO / SERVICIO</th><th style="width: 20%;">CANTIDAD</th></tr></thead>
-            <tbody>{filas_tabla}</tbody>
-        </table>
-        <div class="obs-container">
-            <strong>OBSERVACIONES Y CONDICIONES:</strong>
-            <div class="obs-cuadro">{observaciones if observaciones else 'Sin observaciones adicionales.'}</div>
-        </div>
-        <table class="firma-box">
-            <tr>
-                <td style="width: 40%;" class="linea-firma"><strong>Por {EMPRESA_NOMBRE}</strong><br>Firma y Sello Autorizado</td>
-                <td style="width: 20%; border: none;"></td>
-                <td style="width: 40%;" class="linea-firma"><strong>Recibido por el Cliente</strong><br>Nombre / C.I. / Fecha</td>
-            </tr>
-        </table>
-    </body>
-    </html>"""
-    
-    nombre_archivo = ruta_salida(f"Nota_{nro_nota}.pdf")
-    HTML(string=html_content, base_url=".").write_pdf(nombre_archivo)
-    return nombre_archivo
 
 # --- 2. INTERFAZ ---
 class VentanaNotas(ctk.CTkToplevel):
